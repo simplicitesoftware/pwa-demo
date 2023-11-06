@@ -5,8 +5,6 @@ window.addEventListener('load', async () => {
     try {
       await navigator.serviceWorker.register('/service-worker.js');
       app = simplicite.session({ url: 'https://demo.dev.simplicite.io' });
-      const user = await app.login({ username: 'website', password: 'simplicite' });
-      document.getElementById('user').innerHTML = `Hello ${user.login}`;
       document.getElementById('refresh').addEventListener('click', loadCatalog);
       loadCatalog();
     } catch (err) {

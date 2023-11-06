@@ -1,6 +1,8 @@
 body {
     font-family: Helvetica, Arial, sans-serif;
     text-align: center;
+    background-color: #fcfcfc;
+    overscroll-behavior: none;
 }
 #catalog {
     display: flex;
