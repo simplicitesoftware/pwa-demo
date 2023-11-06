@@ -12,12 +12,12 @@ self.addEventListener('install', event => {
     console.log('Service worker install', event);
     event.waitUntil(addResourcesToCache([
         '/',
-        '/manifest.json',
         '/index.html',
         '/styles.css',
         '/script.js',
         '/simplicite.min.js',
         '/images/logo.svg',
+        '/manifest.json',
         '/icons/favicon.png',
         '/icons/icon32.png',
         '/icons/icon48.png',
