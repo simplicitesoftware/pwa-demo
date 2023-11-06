@@ -1,0 +1,27 @@
+{
+  "name": "pwa-demo",
+  "description": "PWA demo",
+  "version": "2.2.37",
+  "author": "Simplicite Software <contact@simplicitesoftware.com> (http://www.simplicitesoftware.com/)",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/simplicitesoftware/pwa-demo.git"
+  },
+  "dependencies": {
+    "simplicite": "^2.2.37"
+  },
+  "devDependencies": {
+    "npm-check-updates": "^16.14.6",
+    "serve": "^14.2.1"
+  },
+  "scripts": {
+    "start": "serve -l 3000 app",
+    "ncu": "ncu"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}
