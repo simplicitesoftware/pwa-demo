@@ -1,19 +1,30 @@
+let app;
+
 window.addEventListener('load', async () => {
   if ('serviceWorker' in navigator) {
     try {
-      const registration = await navigator.serviceWorker.register('/service-worker.js');
-      console.log('Service worker registration succeeded:', registration);
-      render();
-    } catch (error) {
-      console.error(`Registration failed with ${error}`);
+      await navigator.serviceWorker.register('/service-worker.js');
+      app = simplicite.session({ url: 'https://demo.dev.simplicite.io' });
+      const user = await app.login({ username: 'website', password: 'simplicite' });
+      document.getElementById('user').innerHTML = `Hello ${user.login}`;
+      document.getElementById('refresh').addEventListener('click', loadCatalog);
+      loadCatalog();
+    } catch (err) {
+      console.error(`Service worker registration failed: ${err}`);
     }
   }
 });
 
-async function render() {
-    console.log('Rendering...');
-    const app = simplicite.session({ url: 'https://demo.dev.simplicite.io', debug: true });
-    const user = await app.login({ username: 'website', password: 'simplicite' });
-    console.log(user);
-    document.getElementById('catalog').innerHTML = `Hello ${user.login}`;
+async function loadCatalog() {
+    const catalog = document.getElementById('catalog');
+    catalog.innerHTML = 'Loading...';
+    let html = '';
+    for (const prd of await app.getBusinessObject('DemoProduct').search({ demoPrdAvailable: true }, { inlineDocuments: [ 'demoPrdPicture' ] }))
+      html += `<div class="product">
+        <img src="data:${prd.demoPrdPicture.mime};base64,${prd.demoPrdPicture.content}"/>
+        <h1>${prd.demoPrdName}</h1>
+        <h2>${prd.demoPrdReference}</h2>
+        <p>${prd.demoPrdDescription}</p>
+        </div>`;
+    catalog.innerHTML = html;
 }
