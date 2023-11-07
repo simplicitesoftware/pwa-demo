@@ -36,84 +36,67 @@ const getResourceFromCache = async request => {
 };
 
 const openIndexedDB = version => {
-    return new Promise(function(resolve, reject) {
+    return new Promise((resolve, reject) => {
         let db;
-        const dbReq = indexedDB.open(remoteName, version);
-        dbReq.onerror = event => {
+        const rq = indexedDB.open(remoteName, version);
+        rq.onerror = event => {
             console.error(`Error opening indexedDB: ${event.target.error.message}`, event);
             reject(event.target.error);
         };
-        dbReq.onsuccess = event => {
-            console.log(`IndexedDB opened`, event);
+        rq.onsuccess = event => {
+            console.log('IndexedDB opened (success)', event);
             db = event.target.result;
             console.log('Opened indexedDB', db);
             resolve(db);
-        }
-        dbReq.onupgradeneeded = event => {
-            console.log('IndexedDB opened for upgrade', event);
+        };
+        rq.onupgradeneeded = event => {
+            console.log('IndexedDB opened (upgrade needed)', event);
             db = event.target.result;
             console.log('Opened indexedDB', db);
             const store = db.createObjectStore('data', { keyPath: '_key'});
             store.transaction.commit();
             console.log('Created indexedDB store', store);
             resolve(db);
-        }
-    });
-}
-
-const readDataFromIndexedDB = (db, store, key) => {
-    return new Promise(function(resolve, reject) {
-        const tr = db.transaction([ store ]);
-        const st = tr.objectStore(store);
-        const rq = st.get(key);
-        rq.onerror = event => {
-            console.error(`Error reading data from indexedDB store=${store} key=${key}: ${event.target.error.message}`, event);
-            reject(event.target.error);
-        };
-        rq.onsuccess = event => {
-            const data = event.target.result;
-            resolve(data);
         };
     });
 };
 
+const readDataFromIndexedDB = (db, store, key) => {
+    return new Promise((resolve, reject) => {
+        const tr = db.transaction([ store ]);
+        const st = tr.objectStore(store);
+        const rq = st.get(key);
+        rq.onerror = event => reject(event.target.error);
+        rq.onsuccess = event => resolve(event.target.result);
+    });
+};
+
 const writeDataToIndexedDB = (db, store, key, data) => {
-    return new Promise(function(resolve, reject) {
+    return new Promise((resolve, reject) => {
         const tr = db.transaction([ store ], 'readwrite');
         const st = tr.objectStore(store);
         data._key = key;
         const rq = st.put(data);
-        rq.onerror = event => {
-            console.error(`Error writing data to indexedDB store=${store} key=${key}: ${event.target.error.message}`, event);
-            reject(event.target.error);
-        };
-        rq.onsuccess = event => {
-            resolve(event.target.result);
-        };
+        rq.onerror = event => reject(event.target.error);
+        rq.onsuccess = event => resolve(event.target.result);
         tr.commit();
     });
 };
 
 const getDataFromIndexedDB = async request => {
+    const db = await openIndexedDB(1);
     try {
-        console.log(`Get data from indexedDB: ${request.url}`);
-        const db = await openIndexedDB(1);
-        console.log('IndexedDB to get data', db);
-        // ---------------------------------------------------------------------------------------
-        const date = new Date().toUTCString();
-        const key = await writeDataToIndexedDB(db, 'data', date, { value: `Hello world! ${date}` });
-        console.log(`Written data to indexedDB key=${key}`);
-        // ---------------------------------------------------------------------------------------
-        const data = await readDataFromIndexedDB(db, 'data', request.url);
-        console.log('Read data from indexedDB', data);
-        // TODO:
-        // - check network status
-        // - return data from indexedDB if network is not available
-        // - store data into indexedDB and return it if network is available
-        return fetch(request);
+        const response = await fetch(request);
+        const data = await response.json();
+        console.log(`Write data to indexedDB for key=${request.url}`);
+        await writeDataToIndexedDB(db, 'data', request.url, data);
+        console.log('Written data to indexedDB');
+        return new Promise(resolve => resolve(new Response(JSON.stringify(data))));
     } catch (error) {
-        console.error(error);
-        return fetch(request); // Try to get from network anyway
+        console.warning('Fetch error', error);
+        console.log(`Read data from indexedDB for key=${request.url}`);
+        const data = await readDataFromIndexedDB(db, 'data', request.url);
+        return new Promise(resolve => resolve(new Response(JSON.stringify(data))));
     }
 };
 
@@ -129,4 +112,8 @@ self.addEventListener('fetch', async event => {
     } else {
         event.respondWith(getResourceFromCache(event.request));
     }
+});
+
+self.addEventListener('message', event => {
+    console.log('Service worker message received', event.data);
 });
