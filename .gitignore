@@ -1,5 +1,5 @@
 node_modules
-app/simplicite.min.js
+app/simplicite.min.js*
 .scannerwork
 **.bak
 **.new

@@ -16,7 +16,7 @@
     "serve": "^14.2.1"
   },
   "scripts": {
-    "start": "cp node_modules/simplicite/dist/simplicite.min.js app && serve -l 3000 app",
+    "start": "cp node_modules/simplicite/dist/simplicite.min.js* app && serve -l 3000 app",
     "ncu": "ncu"
   },
   "browserslist": [
