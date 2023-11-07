@@ -99,8 +99,11 @@ const getDataFromIndexedDB = async request => {
         console.log(`Get data from indexedDB: ${request.url}`);
         const db = await openIndexedDB(1);
         console.log('IndexedDB to get data', db);
-        const key = await writeDataToIndexedDB(db, 'data', 'test', { value: 'Hello world!' });
+        // ---------------------------------------------------------------------------------------
+        const date = new Date().toUTCString();
+        const key = await writeDataToIndexedDB(db, 'data', date, { value: `Hello world! ${date}` });
         console.log(`Written data to indexedDB key=${key}`);
+        // ---------------------------------------------------------------------------------------
         const data = await readDataFromIndexedDB(db, 'data', request.url);
         console.log('Read data from indexedDB', data);
         // TODO:
