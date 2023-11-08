@@ -1,6 +1,7 @@
 const remoteName = 'demo.dev.simplicite.io';
 const remoteURL = `https://${remoteName}`;
 
+const dbVersion = 1;
 const dataStoreName = 'data';
 
 const debug = false;
@@ -39,24 +40,23 @@ const getResourceFromCache = async request => {
     if (resource) {
         console.log(`Get resource from cache: ${request.url}`);
         return resource;
-     } else {
+    } else {
         console.log(`Get resource from fetch: ${request.url}`);
         return fetch(request);
-     }
+    }
 };
 
 const openIndexedDB = () => {
     return new Promise((resolve, reject) => {
-        let db;
-        const rq = indexedDB.open(remoteName, 1);
+        const rq = indexedDB.open(remoteName, dbVersion);
         rq.onerror = event => reject(event.target.error);
         rq.onsuccess = event => resolve(event.target.result);
     });
 };
 
-const readDataFromIndexedDB = (key) => {
-    return new Promise(async (resolve, reject) => {
-        const db = await openIndexedDB();
+const readDataFromIndexedDB = async (key) => {
+    const db = await openIndexedDB();
+    return new Promise((resolve, reject) => {
         const tr = db.transaction([ dataStoreName ]);
         const st = tr.objectStore(dataStoreName);
         const rq = st.get(key);
@@ -65,9 +65,9 @@ const readDataFromIndexedDB = (key) => {
     });
 };
 
-const writeDataToIndexedDB = (key, data) => {
-    return new Promise(async (resolve, reject) => {
-        const db = await openIndexedDB();
+const writeDataToIndexedDB = async (key, data) => {
+    const db = await openIndexedDB();
+    return new Promise((resolve, reject) => {
         const tr = db.transaction([ dataStoreName ], 'readwrite');
         const st = tr.objectStore(dataStoreName);
         data._key = key;
@@ -80,7 +80,6 @@ const writeDataToIndexedDB = (key, data) => {
 
 const getDataFromIndexedDB = async request => {
     // Network first logic
-    const db = await openIndexedDB(1);
     try {
         const response = await fetch(request);
         const data = await response.json();
@@ -92,10 +91,10 @@ const getDataFromIndexedDB = async request => {
         }
         return new Promise(resolve => resolve(new Response(JSON.stringify(data))));
     } catch (error) {
-        console.warn('Fetch error', error);
+        if (debug) console.log('Fetch error', error);
         try {
             const data = await readDataFromIndexedDB(request.url);
-            delete data_key;
+            delete data._key;
             console.log(`Got data from indexedDB: ${request.url}`, data);
             return new Promise(resolve => resolve(new Response(JSON.stringify(data))));
         } catch (error) {
@@ -106,15 +105,15 @@ const getDataFromIndexedDB = async request => {
 };
 
 self.addEventListener('install', async event => {
-    /*if (debug) */console.log(`${Date.now()} - Install event`, event);
+    if (debug) console.log(`${Date.now()} - Install event`, event);
     event.waitUntil(addResourcesToCache(appResources));
 
     // Create indexedDB and the data store if needed
-    const rq = indexedDB.open(remoteName, 1);
+    const rq = indexedDB.open(remoteName, dbVersion);
     rq.onerror = event => console.error(event.target.error);
     rq.onupgradeneeded = event => {
         if (debug) console.log('IndexedDB upgradeneeded event', event);
-        db = event.target.result;
+        const db = event.target.result;
         if (debug) console.log('Opened indexedDB for upgrade', db);
         const st = db.createObjectStore(dataStoreName, { keyPath: '_key'});
         st.transaction.commit();
@@ -123,11 +122,12 @@ self.addEventListener('install', async event => {
 });
 
 self.addEventListener('activate', event => {
-    /*if (debug) */console.log(`${Date.now()} - Activate event`, event);
+    if (debug) console.log(`${Date.now()} - Activate event`, event);
+    return self.clients.claim();
 });
 
 self.addEventListener('fetch', async event => {
-    /*if (debug) */console.log(`${Date.now()} - Fetch event ${event.request.url}`, event);
+    if (debug) console.log(`${Date.now()} - Fetch event ${event.request.url}`, event);
     if (event.request.url.startsWith(remoteURL)) {
         event.respondWith(getDataFromIndexedDB(event.request));
     } else {
@@ -136,5 +136,6 @@ self.addEventListener('fetch', async event => {
 });
 
 self.addEventListener('message', event => {
-    /*if (debug) */console.log(`${Date.now()} - Message event`, event);
+    if (debug) console.log(`${Date.now()} - Message event`, event);
+    console.log(`Message: ${event.data}`);
 });

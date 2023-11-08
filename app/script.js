@@ -6,9 +6,13 @@ window.addEventListener('load', async () => {
     if ('serviceWorker' in navigator) {
         try {
             sw = await navigator.serviceWorker.register('/service-worker.js');
+
             app = simplicite.session({ url: 'https://demo.dev.simplicite.io' });
-            document.getElementById('refresh').addEventListener('click', loadCatalog);
             await loadCatalog();
+
+            const b = document.getElementById('refresh');
+            b.addEventListener('click', loadCatalog);
+            b.disabled = false;
         } catch (err) {
             console.error(`Service worker registration failed: ${err}`);
         }
@@ -17,10 +21,11 @@ window.addEventListener('load', async () => {
 
 async function loadCatalog() {
     const catalog = document.getElementById('catalog');
-    catalog.innerHTML = 'Loading...';
+    catalog.innerHTML = '<p>Loading...</p>';
     try {
         const prds = await app.getBusinessObject('DemoProduct').search({ demoPrdAvailable: true }, { inlineDocuments: [ 'demoPrdPicture' ] });
-        if (sw && sw.active) sw.active.postMessage('Products loaded');
+        sw.active.postMessage(`${prds.length} product(s) loaded!`);
+
         let html = '';
         for (const prd of prds)
             html += `<div class="product">

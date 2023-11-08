@@ -5,7 +5,7 @@
             "type": "chrome",
             "request": "launch",
             "name": "Debug in Chrome",
-            "url": "https://vscode-frontend.simplicite.io/",
+            "url": "http://localhost:3000/",
             "webRoot": "${workspaceFolder}/app"
         }
     ]
