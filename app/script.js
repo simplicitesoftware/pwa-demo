@@ -20,7 +20,7 @@ async function loadCatalog() {
     catalog.innerHTML = 'Loading...';
     try {
         const prds = await app.getBusinessObject('DemoProduct').search({ demoPrdAvailable: true }, { inlineDocuments: [ 'demoPrdPicture' ] });
-        sw.active.postMessage('Products loaded');
+        if (sw && sw.active) sw.active.postMessage('Products loaded');
         let html = '';
         for (const prd of prds)
             html += `<div class="product">
