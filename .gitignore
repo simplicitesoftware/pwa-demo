@@ -5,6 +5,7 @@ app/simplicite.min.js*
 **.new
 **.tmp
 **.log
+**.zip
 **/Thumbs.db
 **/.DS_Store
 

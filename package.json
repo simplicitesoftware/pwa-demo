@@ -12,6 +12,7 @@
     "simplicite": "^2.2.37"
   },
   "devDependencies": {
+    "@ffflorian/jszip-cli": "^3.4.1",
     "eslint": "^8.53.0",
     "npm-check-updates": "^16.14.6",
     "serve": "^14.2.1",
@@ -19,7 +20,8 @@
   },
   "scripts": {
     "lint": "eslint \"app/**.js\" && stylelint \"app/**.css\"",
-    "start": "cp node_modules/simplicite/dist/simplicite.min.js* app && serve -l 3000 app",
+    "start": "cp node_modules/simplicite/dist/simplicite.min.js app && serve -l 3000 app",
+    "zip": "rm -f SITE.zip && cd app && jszip-cli add --output ../SITE.zip .",
     "ncu": "ncu"
   },
   "browserslist": [

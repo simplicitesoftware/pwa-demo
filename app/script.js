@@ -11,7 +11,11 @@ window.addEventListener('load', async () => {
             await loadCatalog();
 
             const b = document.getElementById('refresh');
-            b.addEventListener('click', loadCatalog);
+            b.addEventListener('click', async () => {
+                b.disabled = true;
+                await loadCatalog();
+                b.disabled = false;
+            });
             b.disabled = false;
         } catch (err) {
             console.error(`Service worker registration failed: ${err}`);

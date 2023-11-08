@@ -17,15 +17,21 @@ body {
     border-radius: 1rem;
     padding: 2rem;
     margin: 1rem;
-    min-width: 20rem;
-    max-width: 20rem;
+    min-width: 12rem;
+    max-width: 12rem;
 }
 .product h1 {
     color: #34975a;
+    font-size: 1.6rem;
 }
 .product h2 {
     color: #c8a54c;
+    font-size: 1.2rem;
 }
 .product p {
     color: #777;
+    font-size: .8rem;
+}
+.product img {
+    width: 10rem;
 }
