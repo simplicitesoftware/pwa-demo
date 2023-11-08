@@ -4,7 +4,7 @@ const remoteURL = `https://${remoteName}`;
 const dbVersion = 1;
 const dataStoreName = 'data';
 
-const debug = false;
+const debug = true;
 
 const appResources = [
     '/',
@@ -32,6 +32,10 @@ const appResources = [
 const addResourcesToCache = async resources => {
     const cache = await caches.open('pwa-demo');
     await cache.addAll(resources);
+};
+
+const clearResourcesFromCache = async () => {
+    await caches.delete('pwa-demo');
 };
 
 const getResourceFromCache = async request => {
@@ -72,6 +76,18 @@ const writeDataToIndexedDB = async (key, data) => {
         const st = tr.objectStore(dataStoreName);
         data._key = key;
         const rq = st.put(data);
+        rq.onerror = event => reject(event.target.error);
+        rq.onsuccess = event => resolve(event.target.result);
+        tr.commit();
+    });
+};
+
+const clearAllDataFromIndexedDB = async () => {
+    const db = await openIndexedDB();
+    return new Promise((resolve, reject) => {
+        const tr = db.transaction([ dataStoreName ], 'readwrite');
+        const st = tr.objectStore(dataStoreName);
+        const rq = st.clear();
         rq.onerror = event => reject(event.target.error);
         rq.onsuccess = event => resolve(event.target.result);
         tr.commit();

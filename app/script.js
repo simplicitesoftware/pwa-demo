@@ -7,28 +7,49 @@ window.addEventListener('load', async () => {
         try {
             sw = await navigator.serviceWorker.register('/service-worker.js');
 
+            sw.addEventListener('updatefound', async event => {
+                console.log('Service worker update found event', event);
+            });
+
+            const bu = document.getElementById('update');
+            bu.addEventListener('click', async () => {
+                bu.disabled = true;
+                await sw.update();
+                bu.disabled = false;
+                //window.location.reload();
+            });
+            bu.disabled = false;
+
             app = simplicite.session({ url: 'https://demo.dev.simplicite.io' });
             await loadCatalog();
 
-            const b = document.getElementById('refresh');
-            b.addEventListener('click', async () => {
-                b.disabled = true;
+            const br = document.getElementById('refresh');
+            br.addEventListener('click', async () => {
+                br.disabled = true;
                 await loadCatalog();
-                b.disabled = false;
+                br.disabled = false;
             });
-            b.disabled = false;
-        } catch (err) {
-            console.error(`Service worker registration failed: ${err}`);
+            br.disabled = false;
+        } catch (error) {
+            console.error(`Service worker registration failed: ${error}`);
         }
     }
 });
+
+function postMessageToServiceWorker(msg) {
+    try {
+        sw.active.postMessage(msg);
+    } catch (error) {
+        console.error(`Unable to send message to service worker ${msg}`, error);
+    }
+}
 
 async function loadCatalog() {
     const catalog = document.getElementById('catalog');
     catalog.innerHTML = '<p>Loading...</p>';
     try {
         const prds = await app.getBusinessObject('DemoProduct').search({ demoPrdAvailable: true }, { inlineDocuments: [ 'demoPrdPicture' ] });
-        sw.active.postMessage(`${prds.length} product(s) loaded!`);
+        postMessageToServiceWorker(`${prds.length} product(s) loaded!`);
 
         let html = '';
         for (const prd of prds)
@@ -39,7 +60,7 @@ async function loadCatalog() {
                 <p>${prd.demoPrdDescription}</p>
                 </div>`;
         catalog.innerHTML = html;
-    } catch (err) {
-        catalog.innerHTML = `Error: ${err}`;
+    } catch (error) {
+        catalog.innerHTML = `Error: ${error.message || error}`;
     }
 }
