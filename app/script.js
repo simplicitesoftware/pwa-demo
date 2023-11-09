@@ -50,7 +50,7 @@ async function loadCatalog() {
     const catalog = document.getElementById('catalog');
     catalog.innerHTML = '<p>Loading...</p>';
     try {
-        const prds = await app.getBusinessObject('DemoProduct').search({ demoPrdAvailable: true }, { inlineDocuments: [ 'demoPrdPicture' ] });
+        const prds = await app.getBusinessObject('DemoProduct').search({ demoPrdAvailable: true }, { inlineDocuments: [ 'demoPrdPicture' ], businessCase: 'catalog' });
         postMessageToServiceWorker(`${prds.length} product(s) loaded!`);
 
         let html = '';

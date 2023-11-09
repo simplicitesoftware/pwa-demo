@@ -100,12 +100,15 @@ const clearAllDataFromIndexedDB = async () => {
 
 const getDataFromIndexedDB = async request => {
     // Network first logic
+    const url = new URL(request.url);
+    const key = url.searchParams.get('_bc') || request.url;
     try {
         const response = await fetch(request);
         const data = await response.json();
         console.log(`Got data from fetch: ${request.url}`, data);
         try {
-            await writeDataToIndexedDB(request.url, data);
+            await writeDataToIndexedDB(key, data);
+            console.log(`Written data to indexedDB as key: ${key}`);
         } catch (error) {
             console.error('Error writing data to indexedDB', error);
         }
@@ -113,9 +116,9 @@ const getDataFromIndexedDB = async request => {
     } catch (error) {
         if (debug) console.log('Fetch error', error);
         try {
-            const data = await readDataFromIndexedDB(request.url);
+            const data = await readDataFromIndexedDB(key);
             delete data._key;
-            console.log(`Got data from indexedDB: ${request.url}`, data);
+            console.log(`Got data from indexedDB from key: ${key}`, data);
             return new Promise(resolve => resolve(new Response(JSON.stringify(data))));
         } catch (error) {
             console.error('Error reading data from indexedDB', error);
