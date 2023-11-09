@@ -35,3 +35,6 @@ body {
 .product img {
     width: 10rem;
 }
+footer {
+    font-size: small;
+}
