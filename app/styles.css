@@ -4,6 +4,14 @@ body {
     background-color: #fcfcfc;
     overscroll-behavior: none;
 }
+button {
+    background: #aaa;
+    color: #fff;
+    border: none;
+    padding: .5rem 2rem;
+    border-radius: .5rem;
+    cursor: pointer;
+}
 .error {
     color: red;
 }
@@ -40,11 +48,6 @@ body {
 }
 .product button {
     background: #2196F3;
-    color: #fff;
-    border: none;
-    padding: .5rem 2rem;
-    border-radius: .5rem;
-    cursor: pointer;
 }
 footer {
     font-size: small;
@@ -52,11 +55,6 @@ footer {
 #refresh, #update {
     position: fixed;
     top: 1rem;
-    color: #fff;
-    border: none;
-    padding: .5rem 2rem;
-    border-radius: .5rem;
-    cursor: pointer;
 }
 #refresh {
     right: 1rem;
