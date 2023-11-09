@@ -1,6 +1,7 @@
 /* globals simplicite */
 
-let sw, app;
+let sw, app, cli;
+const cliCode = 'CLI001';
 
 window.addEventListener('load', async () => {
     if ('serviceWorker' in navigator) {
@@ -23,12 +24,13 @@ window.addEventListener('load', async () => {
             */
 
             app = simplicite.session({ url: 'https://demo.dev.simplicite.io' });
-            await loadCustomer('CLI001');
+            await loadCustomer(cliCode);
             await loadProducts();
 
             const br = document.getElementById('refresh');
             br.addEventListener('click', async () => {
                 br.disabled = true;
+                await loadCustomer(cliCode);
                 await loadProducts();
                 br.disabled = false;
             });
@@ -51,18 +53,15 @@ function getError(error) {
     return `<span class="error"><stong>Error<strong>: ${error.message || error}</span>`;
 }
 
-let cli;
-
 async function loadCustomer(code) {
     const customer = document.getElementById('customer');
-    customer.innerHTML = '<p>Loading...</p>';
+    customer.innerHTML = '<p>Loading customer...</p>';
     try {
         const clis = await app.getBusinessObject('DemoClient').search({ demoCliCode: code }, { businessCase: 'customer' });
         postMessageToServiceWorker(`${clis.length} customers(s) found`);
 
         if (clis.length == 1) {
             cli = clis[0];
-            console.log(cli);
             customer.innerHTML = `Hello ${cli.demoCliFirstname} ${cli.demoCliLastname}`;
         } else
             throw new Error(`Unable to find a single customer for code ${code}`);
@@ -73,7 +72,7 @@ async function loadCustomer(code) {
 
 async function loadProducts() {
     const products = document.getElementById('products');
-    products.innerHTML = '<p>Loading...</p>';
+    products.innerHTML = '<p>Loading products...</p>';
     try {
         const prds = await app.getBusinessObject('DemoProduct').search({ demoPrdAvailable: true }, { inlineDocuments: [ 'demoPrdPicture' ], businessCase: 'products' });
         postMessageToServiceWorker(`${prds.length} product(s) found`);
@@ -81,7 +80,6 @@ async function loadProducts() {
         if (prds.length > 0) {
             let html = '';
             for (const prd of prds) {
-                console.log(prd);
                 html += `<div class="product">
                     <img src="data:${prd.demoPrdPicture.mime};base64,${prd.demoPrdPicture.content}"/>
                     <h1>${prd.demoPrdName}</h1>

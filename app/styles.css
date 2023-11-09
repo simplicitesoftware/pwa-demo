@@ -49,3 +49,20 @@ body {
 footer {
     font-size: small;
 }
+#refresh, #update {
+    position: fixed;
+    top: 1rem;
+    color: #fff;
+    border: none;
+    padding: .5rem 2rem;
+    border-radius: .5rem;
+    cursor: pointer;
+}
+#refresh {
+    right: 1rem;
+    background: #f36e21;
+}
+#update {
+    left: 1rem;
+    background: #469222;
+}

@@ -4,7 +4,7 @@ const remoteURL = `https://${remoteName}`;
 const dbVersion = 1;
 const dataStoreName = 'data';
 
-const debug = true;
+const debug = false;
 
 const appResources = [
     '/',
@@ -41,13 +41,13 @@ const clearResourcesFromCache = async () => {
 */
 
 const getResourceFromCache = async request => {
-    // cache first logic
+    // Cache first logic
     const resource = await caches.match(request);
     if (resource) {
         console.log(`Get resource from cache: ${request.url}`);
         return resource;
     } else {
-        console.log(`Get resource from fetch: ${request.url}`);
+        console.log(`Get resource from network: ${request.url}`);
         return fetch(request);
     }
 };
@@ -105,12 +105,12 @@ const getDataFromIndexedDB = async request => {
     try {
         const response = await fetch(request);
         const data = await response.json();
-        console.log(`Got data from fetch: ${request.url}`, data);
+        console.log(`Got data from network: ${request.url}`, data);
         try {
             await writeDataToIndexedDB(key, data);
-            console.log(`Written data to indexedDB as key: ${key}`);
+            console.log(`Written data to database as key: ${key}`);
         } catch (error) {
-            console.error('Error writing data to indexedDB', error);
+            console.error('Error writing data to database', error);
         }
         return new Promise(resolve => resolve(new Response(JSON.stringify(data))));
     } catch (error) {
@@ -118,10 +118,10 @@ const getDataFromIndexedDB = async request => {
         try {
             const data = await readDataFromIndexedDB(key);
             delete data._key;
-            console.log(`Got data from indexedDB from key: ${key}`, data);
+            console.log(`Got data from database from key: ${key}`, data);
             return new Promise(resolve => resolve(new Response(JSON.stringify(data))));
         } catch (error) {
-            console.error('Error reading data from indexedDB', error);
+            console.error('Error reading data from database', error);
             return new Promise(resolve => resolve(new Response(JSON.stringify({ type: 'error', response: { message: error.message } }))));
         }
     }
@@ -131,16 +131,16 @@ self.addEventListener('install', async event => {
     if (debug) console.log(`${Date.now()} - Install event`, event);
     event.waitUntil(addResourcesToCache(appResources));
 
-    // Create indexedDB and the data store if needed
+    // Create database and the datastore if needed
     const rq = indexedDB.open(remoteName, dbVersion);
     rq.onerror = event => console.error(event.target.error);
     rq.onupgradeneeded = event => {
         if (debug) console.log('IndexedDB upgradeneeded event', event);
         const db = event.target.result;
-        if (debug) console.log('Opened indexedDB for upgrade', db);
+        if (debug) console.log(`Opened ${remoteName} database for upgrade`, db);
         const st = db.createObjectStore(dataStoreName, { keyPath: '_key'});
         st.transaction.commit();
-        if (debug) console.log('Created indexedDB store', st);
+        if (debug) console.log(`Created ${dataStoreName} datastore`, st);
     };
 });
 
