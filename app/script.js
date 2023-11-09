@@ -7,6 +7,7 @@ window.addEventListener('load', async () => {
         try {
             sw = await navigator.serviceWorker.register('/service-worker.js');
 
+            /* Experimental: Update service worker
             sw.addEventListener('updatefound', async event => {
                 console.log('Service worker update found event', event);
             });
@@ -19,6 +20,7 @@ window.addEventListener('load', async () => {
                 //window.location.reload();
             });
             bu.disabled = false;
+            */
 
             app = simplicite.session({ url: 'https://demo.dev.simplicite.io' });
             await loadCatalog();

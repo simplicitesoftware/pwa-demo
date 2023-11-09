@@ -34,9 +34,11 @@ const addResourcesToCache = async resources => {
     await cache.addAll(resources);
 };
 
+/* Not yet used
 const clearResourcesFromCache = async () => {
     await caches.delete('pwa-demo');
 };
+*/
 
 const getResourceFromCache = async request => {
     // cache first logic
@@ -82,6 +84,7 @@ const writeDataToIndexedDB = async (key, data) => {
     });
 };
 
+/* Not yet used
 const clearAllDataFromIndexedDB = async () => {
     const db = await openIndexedDB();
     return new Promise((resolve, reject) => {
@@ -93,6 +96,7 @@ const clearAllDataFromIndexedDB = async () => {
         tr.commit();
     });
 };
+*/
 
 const getDataFromIndexedDB = async request => {
     // Network first logic
