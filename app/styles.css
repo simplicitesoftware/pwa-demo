@@ -4,7 +4,10 @@ body {
     background-color: #fcfcfc;
     overscroll-behavior: none;
 }
-#catalog {
+.error {
+    color: red;
+}
+#products {
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
@@ -34,6 +37,14 @@ body {
 }
 .product img {
     width: 10rem;
+}
+.product button {
+    background: #2196F3;
+    color: #fff;
+    border: none;
+    padding: .5rem 2rem;
+    border-radius: .5rem;
+    cursor: pointer;
 }
 footer {
     font-size: small;

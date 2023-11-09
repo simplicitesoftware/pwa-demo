@@ -23,12 +23,13 @@ window.addEventListener('load', async () => {
             */
 
             app = simplicite.session({ url: 'https://demo.dev.simplicite.io' });
-            await loadCatalog();
+            await loadCustomer('CLI001');
+            await loadProducts();
 
             const br = document.getElementById('refresh');
             br.addEventListener('click', async () => {
                 br.disabled = true;
-                await loadCatalog();
+                await loadProducts();
                 br.disabled = false;
             });
             br.disabled = false;
@@ -46,23 +47,60 @@ function postMessageToServiceWorker(msg) {
     }
 }
 
-async function loadCatalog() {
-    const catalog = document.getElementById('catalog');
-    catalog.innerHTML = '<p>Loading...</p>';
-    try {
-        const prds = await app.getBusinessObject('DemoProduct').search({ demoPrdAvailable: true }, { inlineDocuments: [ 'demoPrdPicture' ], businessCase: 'catalog' });
-        postMessageToServiceWorker(`${prds.length} product(s) loaded!`);
+function getError(error) {
+    return `<span class="error"><stong>Error<strong>: ${error.message || error}</span>`;
+}
 
-        let html = '';
-        for (const prd of prds)
-            html += `<div class="product">
-                <img src="data:${prd.demoPrdPicture.mime};base64,${prd.demoPrdPicture.content}"/>
-                <h1>${prd.demoPrdName}</h1>
-                <h2>${prd.demoPrdReference}</h2>
-                <p>${prd.demoPrdDescription}</p>
-                </div>`;
-        catalog.innerHTML = html;
+let cli;
+
+async function loadCustomer(code) {
+    const customer = document.getElementById('customer');
+    customer.innerHTML = '<p>Loading...</p>';
+    try {
+        const clis = await app.getBusinessObject('DemoClient').search({ demoCliCode: code }, { businessCase: 'customer' });
+        postMessageToServiceWorker(`${clis.length} customers(s) found`);
+
+        if (clis.length == 1) {
+            cli = clis[0];
+            console.log(cli);
+            customer.innerHTML = `Hello ${cli.demoCliFirstname} ${cli.demoCliLastname}`;
+        } else
+            throw new Error(`Unable to find a single customer for code ${code}`);
     } catch (error) {
-        catalog.innerHTML = `Error: ${error.message || error}`;
+        customer.innerHTML = getError(error);
     }
+}
+
+async function loadProducts() {
+    const products = document.getElementById('products');
+    products.innerHTML = '<p>Loading...</p>';
+    try {
+        const prds = await app.getBusinessObject('DemoProduct').search({ demoPrdAvailable: true }, { inlineDocuments: [ 'demoPrdPicture' ], businessCase: 'products' });
+        postMessageToServiceWorker(`${prds.length} product(s) found`);
+
+        if (prds.length > 0) {
+            let html = '';
+            for (const prd of prds) {
+                console.log(prd);
+                html += `<div class="product">
+                    <img src="data:${prd.demoPrdPicture.mime};base64,${prd.demoPrdPicture.content}"/>
+                    <h1>${prd.demoPrdName}</h1>
+                    <h2>${prd.demoPrdReference}</h2>
+                    <p>${prd.demoPrdDescription}</p>
+                    <button class="product-order" data-rowid="${prd.row_id}">Order!</button>
+                    </div>`;
+            }
+            products.innerHTML = html;
+
+            for (const b of document.querySelectorAll('.product-order'))
+                b.addEventListener('click', () => orderProduct(b.getAttribute('data-rowid')));
+        } else
+            throw new Error('Unable to find any available product');
+    } catch (error) {
+        products.innerHTML = getError(error);
+    }
+}
+
+async function orderProduct(prdId) {
+    window.alert(`TODO: Place order product ${prdId} for customer ${cli.row_id}`);
 }
