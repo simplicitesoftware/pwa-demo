@@ -32,7 +32,7 @@ button {
     max-width: 12rem;
 }
 .product h1 {
-    color: #34975a;
+    color: #3c975f;
     font-size: 1.6rem;
 }
 .product h2 {
@@ -48,6 +48,19 @@ button {
 }
 .product button {
     background: #2196F3;
+    font-style: normal;
+}
+.product button:disabled {
+    background: #aaa;
+    font-style: italic;
+}
+#customer button {
+    background: #f36e21;
+}
+#customer input {
+    border: solid .0125rem #aaa;
+    border-radius: .4rem;
+    padding: .4rem;
 }
 footer {
     font-size: small;
@@ -58,9 +71,9 @@ footer {
 }
 #refresh {
     right: 1rem;
-    background: #f36e21;
+    background: #34975a;
 }
 #update {
     left: 1rem;
-    background: #469222;
+    background: #922283;
 }

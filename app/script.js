@@ -1,7 +1,10 @@
 /* globals simplicite */
 
-let sw, app, cli;
-const cliCode = 'CLI001';
+const url = 'https://demo.dev.simplicite.io';
+const username = 'website';
+const password = 'simplicite';
+
+let sw, app, cliCode, cliId;
 
 window.addEventListener('load', async () => {
     if ('serviceWorker' in navigator) {
@@ -23,15 +26,31 @@ window.addEventListener('load', async () => {
             bu.disabled = false;
             */
 
-            app = simplicite.session({ url: 'https://demo.dev.simplicite.io' });
-            await loadCustomer(cliCode);
+            let authtoken = window.localStorage.getItem('authtoken');
+            if (!authtoken) {
+                app = simplicite.session({ url: url, username: username, password: password });
+                const user = await app.login(); // Get the token
+                window.localStorage.setItem('authtoken', user.authtoken);
+            } else {
+                // Just set the token (do not call the login method)
+                app = simplicite.session({ url: url, authtoken: authtoken });
+            }
+
             await loadProducts();
+
+            const code = document.getElementById('customer-code');
+            const ok = document.getElementById('customer-code-ok');
+            ok.addEventListener('click', async () => {
+                cliCode = code.value;
+                await loadCustomer(cliCode);
+            });
+            code.focus();
 
             const br = document.getElementById('refresh');
             br.addEventListener('click', async () => {
                 br.disabled = true;
-                await loadCustomer(cliCode);
                 await loadProducts();
+                await loadCustomer(cliCode);
                 br.disabled = false;
             });
             br.disabled = false;
@@ -50,19 +69,26 @@ function postMessageToServiceWorker(msg) {
 }
 
 function getError(error) {
-    return `<span class="error"><stong>Error<strong>: ${error.message || error}</span>`;
+    return `<span class="error"><strong>Error</strong>: ${error.message || error}</span>`;
 }
 
 async function loadCustomer(code) {
     const customer = document.getElementById('customer');
     customer.innerHTML = '<p>Loading customer...</p>';
     try {
-        const clis = await app.getBusinessObject('DemoClient').search({ demoCliCode: code }, { businessCase: 'customer' });
+        const clis = await app.getBusinessObject('DemoClient').search({ demoCliCode: code }, { businessCase: `customer-${cliCode}` });
         postMessageToServiceWorker(`${clis.length} customers(s) found`);
 
         if (clis.length == 1) {
-            cli = clis[0];
+            const cli = clis[0];
             customer.innerHTML = `Hello ${cli.demoCliFirstname} ${cli.demoCliLastname}`;
+            cliId = cli.row_id;
+
+            for (const b of document.querySelectorAll('.product-order')) {
+                b.addEventListener('click', () => orderProduct(b.getAttribute('data-rowid')));
+                b.style.display = 'inline';
+                b.disabled = false;
+            }
         } else
             throw new Error(`Unable to find a single customer for code ${code}`);
     } catch (error) {
@@ -85,13 +111,10 @@ async function loadProducts() {
                     <h1>${prd.demoPrdName}</h1>
                     <h2>${prd.demoPrdReference}</h2>
                     <p>${prd.demoPrdDescription}</p>
-                    <button class="product-order" data-rowid="${prd.row_id}">Order!</button>
+                    <button class="product-order" data-rowid="${prd.row_id}" disabled="disabled" style="display: none;">Order!</button>
                     </div>`;
             }
             products.innerHTML = html;
-
-            for (const b of document.querySelectorAll('.product-order'))
-                b.addEventListener('click', () => orderProduct(b.getAttribute('data-rowid')));
         } else
             throw new Error('Unable to find any available product');
     } catch (error) {
@@ -100,5 +123,5 @@ async function loadProducts() {
 }
 
 async function orderProduct(prdId) {
-    window.alert(`TODO: Place order product ${prdId} for customer ${cli.row_id}`);
+    window.alert(`TODO: Place order product ${prdId} for customer ${cliId}`);
 }

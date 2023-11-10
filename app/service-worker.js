@@ -101,22 +101,30 @@ const clearAllDataFromIndexedDB = async () => {
 const getDataFromIndexedDB = async request => {
     // Network first logic
     const url = new URL(request.url);
-    const key = url.searchParams.get('_bc') || request.url;
+    const key = url.searchParams.get('_bc');
+    const action = url.searchParams.get('action');
+    const loginLogout = action == 'login' || action == 'logout';
     try {
         const response = await fetch(request);
         const data = await response.json();
         console.log(`Got data from network: ${request.url}`, data);
-        try {
-            await writeDataToIndexedDB(key, data);
-            console.log(`Written data to database as key: ${key}`);
-        } catch (error) {
-            console.error('Error writing data to database', error);
+        if (!loginLogout) {
+            try {
+                await writeDataToIndexedDB(key, data);
+                console.log(`Written data to database as key: ${key}`);
+            } catch (error) {
+                console.error('Error writing data to database', error);
+            }
         }
         return new Promise(resolve => resolve(new Response(JSON.stringify(data))));
     } catch (error) {
         if (debug) console.log('Fetch error', error);
         try {
+            if (loginLogout)
+                throw new Error('Unable to login or logout while offline');
             const data = await readDataFromIndexedDB(key);
+            if (!data)
+                throw new Error('Requested data is not available offline');
             delete data._key;
             console.log(`Got data from database from key: ${key}`, data);
             return new Promise(resolve => resolve(new Response(JSON.stringify(data))));
