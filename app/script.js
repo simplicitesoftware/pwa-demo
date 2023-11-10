@@ -38,15 +38,17 @@ window.addEventListener('load', async () => {
 
             await loadProducts();
 
-            const code = document.getElementById('customer-code');
-            const ok = document.getElementById('customer-code-ok');
-            ok.addEventListener('click', async () => {
+            const applyCustomerCode = async () => {
                 cliCode = code.value.trim();
                 if (!cliCode)
                     code.focus();
                 else
                     await loadCustomer(cliCode);
-            });
+            };
+            const code = document.getElementById('customer-code');
+            code.addEventListener('keydown', event => { if (event.code == 'Enter') applyCustomerCode(); });
+            const ok = document.getElementById('customer-code-ok');
+            ok.addEventListener('click', applyCustomerCode);
             code.focus();
 
             const br = document.getElementById('refresh');
@@ -77,7 +79,7 @@ function clearMessages() {
 }
 
 function showError(error) {
-    document.getElementById('messages').innerHTML = `<span class="error"><strong>Error</strong>: ${error.message || error}</span>`;
+    document.getElementById('messages').innerHTML = `<div class="error"><strong>Error</strong>: ${error.message || error}</div>`;
 }
 
 async function loadCustomer(code) {
@@ -106,7 +108,7 @@ async function loadCustomer(code) {
 async function loadProducts() {
     clearMessages();
     const products = document.getElementById('products');
-    products.innerHTML = '<p>Loading products...</p>';
+    products.innerHTML = '<div>Loading products...</div>';
     try {
         const prds = await app.getBusinessObject('DemoProduct').search({ demoPrdAvailable: true }, { inlineDocuments: [ 'demoPrdPicture' ], businessCase: 'products' });
         postMessageToServiceWorker(`${prds.length} product(s) found`);
@@ -126,7 +128,7 @@ async function loadProducts() {
         } else
             throw new Error('Unable to find any available product');
     } catch (error) {
-        products.innerHTML = '<p>No product</p>';
+        products.innerHTML = '<div>No product</div>';
         showError(error);
     }
 }

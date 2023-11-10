@@ -1,3 +1,5 @@
+const appName = 'pwa-demo';
+
 const remoteName = 'demo.dev.simplicite.io';
 const remoteURL = `https://${remoteName}`;
 
@@ -30,18 +32,18 @@ const appResources = [
 ];
 
 const addResourcesToCache = async resources => {
-    const cache = await caches.open('pwa-demo');
+    const cache = await caches.open(appName);
     await cache.addAll(resources);
 };
 
 /* Not yet used
 const clearResourcesFromCache = async () => {
-    await caches.delete('pwa-demo');
+    await caches.delete(appName);
 };
 */
 
+// Cache first logic
 const getResourceFromCache = async request => {
-    // Cache first logic
     const resource = await caches.match(request);
     if (resource) {
         console.log(`Get resource from cache: ${request.url}`);
@@ -88,7 +90,7 @@ const writeDataToIndexedDB = async (key, data) => {
 const clearAllDataFromIndexedDB = async () => {
     const db = await openIndexedDB();
     return new Promise((resolve, reject) => {
-        const tr = db.transaction([ dataStoreName ], 'readwrite');
+        const tr = db.transaction([ ds ], 'readwrite');
         const st = tr.objectStore(dataStoreName);
         const rq = st.clear();
         rq.onerror = event => reject(event.target.error);
@@ -98,12 +100,13 @@ const clearAllDataFromIndexedDB = async () => {
 };
 */
 
+// Network first logic
 const getDataFromIndexedDB = async request => {
-    // Network first logic
     const url = new URL(request.url);
     const key = url.searchParams.get('_bc');
     const action = url.searchParams.get('action');
     const loginLogout = action == 'login' || action == 'logout';
+
     try {
         const response = await fetch(request);
         const data = await response.json();
@@ -129,7 +132,7 @@ const getDataFromIndexedDB = async request => {
                 throw new Error('Unable to login or logout while offline');
             const data = await readDataFromIndexedDB(key);
             if (!data)
-                throw new Error('Requested data is not available offline');
+                throw new Error(`Requested data (${key}) is not available offline`);
             delete data._key;
             delete data._request;
             console.log(`Got data from database from key: ${key}`, data);
@@ -143,36 +146,41 @@ const getDataFromIndexedDB = async request => {
 
 self.addEventListener('install', async event => {
     if (debug) console.log(`${Date.now()} - Install event`, event);
+
     event.waitUntil(addResourcesToCache(appResources));
 
     // Create database and the datastore if needed
     const rq = indexedDB.open(remoteName, dbVersion);
     rq.onerror = event => console.error(event.target.error);
-    rq.onupgradeneeded = event => {
+    rq.onupgradeneeded = async event => {
         if (debug) console.log('IndexedDB upgradeneeded event', event);
+
         const db = event.target.result;
         if (debug) console.log(`Opened ${remoteName} database for upgrade`, db);
-        const st = db.createObjectStore(dataStoreName, { keyPath: '_key'});
-        st.transaction.commit();
-        if (debug) console.log(`Created ${dataStoreName} datastore`, st);
+
+        const std = await db.createObjectStore(dataStoreName, { keyPath: '_key'});
+        await std.transaction.commit();
+        if (debug) console.log(`Created ${dataStoreName} datastore`, std);
     };
 });
 
 self.addEventListener('activate', event => {
     if (debug) console.log(`${Date.now()} - Activate event`, event);
+
     return self.clients.claim();
 });
 
 self.addEventListener('fetch', async event => {
     if (debug) console.log(`${Date.now()} - Fetch event ${event.request.url}`, event);
-    if (event.request.url.startsWith(remoteURL)) {
+
+    if (event.request.url.startsWith(remoteURL))
         event.respondWith(getDataFromIndexedDB(event.request));
-    } else {
+    else
         event.respondWith(getResourceFromCache(event.request));
-    }
 });
 
 self.addEventListener('message', event => {
     if (debug) console.log(`${Date.now()} - Message event`, event);
+
     console.log(`Message: ${event.data}`);
 });

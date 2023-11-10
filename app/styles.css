@@ -13,7 +13,11 @@ button {
     cursor: pointer;
 }
 .error {
-    color: red;
+    color: #551010;
+    padding: .5rem;
+    margin-bottom: .5rem;
+    background: #f0cdcd;
+    border-radius: 1rem;
 }
 #products {
     display: flex;
