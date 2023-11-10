@@ -41,8 +41,11 @@ window.addEventListener('load', async () => {
             const code = document.getElementById('customer-code');
             const ok = document.getElementById('customer-code-ok');
             ok.addEventListener('click', async () => {
-                cliCode = code.value;
-                await loadCustomer(cliCode);
+                cliCode = code.value.trim();
+                if (!cliCode)
+                    code.focus();
+                else
+                    await loadCustomer(cliCode);
             });
             code.focus();
 
@@ -50,7 +53,8 @@ window.addEventListener('load', async () => {
             br.addEventListener('click', async () => {
                 br.disabled = true;
                 await loadProducts();
-                await loadCustomer(cliCode);
+                if (cliCode)
+                    await loadCustomer(cliCode);
                 br.disabled = false;
             });
             br.disabled = false;
@@ -68,20 +72,23 @@ function postMessageToServiceWorker(msg) {
     }
 }
 
-function getError(error) {
-    return `<span class="error"><strong>Error</strong>: ${error.message || error}</span>`;
+function clearMessages() {
+    document.getElementById('messages').innerHTML = '';
+}
+
+function showError(error) {
+    document.getElementById('messages').innerHTML = `<span class="error"><strong>Error</strong>: ${error.message || error}</span>`;
 }
 
 async function loadCustomer(code) {
-    const customer = document.getElementById('customer');
-    customer.innerHTML = '<p>Loading customer...</p>';
+    clearMessages();
     try {
         const clis = await app.getBusinessObject('DemoClient').search({ demoCliCode: code }, { businessCase: `customer-${cliCode}` });
         postMessageToServiceWorker(`${clis.length} customers(s) found`);
 
         if (clis.length == 1) {
             const cli = clis[0];
-            customer.innerHTML = `Hello ${cli.demoCliFirstname} ${cli.demoCliLastname}`;
+            document.getElementById('customer').innerHTML = `<strong>Customer</strong>: ${cli.demoCliFirstname} ${cli.demoCliLastname}`;
             cliId = cli.row_id;
 
             for (const b of document.querySelectorAll('.product-order')) {
@@ -92,11 +99,12 @@ async function loadCustomer(code) {
         } else
             throw new Error(`Unable to find a single customer for code ${code}`);
     } catch (error) {
-        customer.innerHTML = getError(error);
+        showError(error);
     }
 }
 
 async function loadProducts() {
+    clearMessages();
     const products = document.getElementById('products');
     products.innerHTML = '<p>Loading products...</p>';
     try {
@@ -118,7 +126,8 @@ async function loadProducts() {
         } else
             throw new Error('Unable to find any available product');
     } catch (error) {
-        products.innerHTML = getError(error);
+        products.innerHTML = '<p>No product</p>';
+        showError(error);
     }
 }
 

@@ -110,6 +110,11 @@ const getDataFromIndexedDB = async request => {
         console.log(`Got data from network: ${request.url}`, data);
         if (!loginLogout) {
             try {
+                console.log(request);
+                data._request = {
+                    url: request.url,
+                    method: request.method
+                };
                 await writeDataToIndexedDB(key, data);
                 console.log(`Written data to database as key: ${key}`);
             } catch (error) {
@@ -126,6 +131,7 @@ const getDataFromIndexedDB = async request => {
             if (!data)
                 throw new Error('Requested data is not available offline');
             delete data._key;
+            delete data._request;
             console.log(`Got data from database from key: ${key}`, data);
             return new Promise(resolve => resolve(new Response(JSON.stringify(data))));
         } catch (error) {
