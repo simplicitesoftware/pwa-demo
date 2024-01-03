@@ -1,7 +1,7 @@
 {
   "name": "pwa-demo",
   "description": "PWA demo",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "author": "Simplicite Software <contact@simplicitesoftware.com> (http://www.simplicitesoftware.com/)",
   "license": "Apache-2.0",
   "repository": {
@@ -9,14 +9,15 @@
     "url": "https://github.com/simplicitesoftware/pwa-demo.git"
   },
   "dependencies": {
-    "simplicite": "^2.3.0"
+    "simplicite": "^2.3.1"
   },
   "devDependencies": {
-    "@ffflorian/jszip-cli": "^3.5.0",
-    "eslint": "^8.53.0",
-    "npm-check-updates": "^16.14.6",
+    "@ffflorian/jszip-cli": "^3.6.2",
+    "eslint": "^8.56.0",
+    "npm-check-updates": "^16.14.12",
     "serve": "^14.2.1",
-    "stylelint": "^15.11.0"
+    "stylelint": "^16.1.0",
+    "stylelint-config-standard": "^36.0.0"
   },
   "scripts": {
     "lint": "eslint \"app/**.js\" && stylelint \"app/**.css\"",

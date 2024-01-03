@@ -1,7 +1,9 @@
 module.exports = {
+	'extends': 'stylelint-config-standard',
 	'rules': {
-		'indentation': 4,
+		'rule-empty-line-before': 'always',
 		'declaration-empty-line-before': 'never',
-		'number-leading-zero': 'never'
+		'declaration-block-no-redundant-longhand-properties': null,
+		'color-hex-length': 'long'
 	}
 };

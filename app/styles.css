@@ -4,14 +4,16 @@ body {
     background-color: #fcfcfc;
     overscroll-behavior: none;
 }
+
 button {
-    background: #aaa;
-    color: #fff;
+    background: #aaaaaa;
+    color: #ffffff;
     border: none;
     padding: .5rem 2rem;
     border-radius: .5rem;
     cursor: pointer;
 }
+
 .error {
     color: #551010;
     padding: .5rem;
@@ -19,64 +21,83 @@ button {
     background: #f0cdcd;
     border-radius: 1rem;
 }
+
 #products {
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
     justify-content: center;
 }
+
 .product {
     background: #f0f0f0;
-    border: solid .0125rem #eee;
-    box-shadow: .5rem .5rem 1rem #aaa;
+    border: solid .0125rem #eeeeee;
+    box-shadow: .5rem .5rem 1rem #aaaaaa;
     border-radius: 1rem;
     padding: 2rem;
     margin: 1rem;
     min-width: 12rem;
     max-width: 12rem;
 }
+
 .product h1 {
     color: #3c975f;
     font-size: 1.6rem;
 }
+
 .product h2 {
     color: #c8a54c;
     font-size: 1.2rem;
 }
+
 .product p {
-    color: #777;
+    color: #777777;
     font-size: .8rem;
 }
+
 .product img {
     width: 10rem;
 }
+
 .product button {
-    background: #2196F3;
+    background: #2196f3;
     font-style: normal;
 }
+
 .product button:disabled {
-    background: #aaa;
+    background: #aaaaaa;
     font-style: italic;
 }
+
 #customer button {
     background: #f36e21;
 }
+
 #customer input {
-    border: solid .0125rem #aaa;
+    border: solid .0125rem #aaaaaa;
     border-radius: .4rem;
     padding: .4rem;
 }
+
+#customer input:focus-visible {
+    outline: inherit;
+    box-shadow: 0 0 1rem #5c93c0;
+}
+
 footer {
     font-size: small;
 }
+
 #refresh, #update {
     position: fixed;
     top: 1rem;
 }
+
 #refresh {
     right: 1rem;
     background: #34975a;
 }
+
 #update {
     left: 1rem;
     background: #922283;
