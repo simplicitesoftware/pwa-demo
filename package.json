@@ -1,15 +1,16 @@
 {
   "name": "pwa-demo",
   "description": "PWA demo",
-  "version": "2.3.1",
+  "version": "3.0.0",
   "author": "Simplicite Software <contact@simplicitesoftware.com> (http://www.simplicitesoftware.com/)",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/simplicitesoftware/pwa-demo.git"
   },
+  "type": "module",
   "dependencies": {
-    "simplicite": "^2.3.1"
+    "simplicite": "^3.0.0"
   },
   "devDependencies": {
     "@ffflorian/jszip-cli": "^3.6.2",
@@ -24,6 +25,9 @@
     "start": "cp node_modules/simplicite/dist/simplicite.min.js app && sed -i '/sourceMappingURL/d' app/simplicite.min.js && serve -l 3000 app",
     "zip": "rm -f SITE.zip && cd app && jszip-cli add --output ../SITE.zip .",
     "ncu": "ncu"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "browserslist": [
     "> 1%",
