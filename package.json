@@ -14,10 +14,10 @@
   },
   "devDependencies": {
     "@ffflorian/jszip-cli": "^3.6.2",
-    "eslint": "^8.56.0",
-    "npm-check-updates": "^16.14.14",
+    "eslint": "^8.57.0",
+    "npm-check-updates": "^16.14.15",
     "serve": "^14.2.1",
-    "stylelint": "^16.2.0",
+    "stylelint": "^16.2.1",
     "stylelint-config-standard": "^36.0.0"
   },
   "scripts": {
