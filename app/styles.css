@@ -1,13 +1,14 @@
 body {
     font-family: Helvetica, Arial, sans-serif;
     text-align: center;
-    background-color: #fcfcfc;
+    background-color: #000;
+    color: #eee;
     overscroll-behavior: none;
 }
 
 button {
-    background: #aaaaaa;
-    color: #ffffff;
+    background: #aaa;
+    color: #fff;
     border: none;
     padding: .5rem 2rem;
     border-radius: .5rem;
@@ -23,7 +24,8 @@ header img {
     color: #551010;
     padding: .5rem;
     margin-bottom: .5rem;
-    background: #f0cdcd;
+    background: #f00;
+    color: #fff;
     border-radius: 1rem;
 }
 
@@ -35,9 +37,9 @@ header img {
 }
 
 .product {
-    background: #f0f0f0;
-    border: solid .0125rem #eeeeee;
-    box-shadow: .5rem .5rem 1rem #aaaaaa;
+    background: #333;
+    border: solid .0125rem #222;
+    box-shadow: .5rem .5rem 1rem #222;
     border-radius: 1rem;
     padding: 2rem;
     margin: 1rem;
@@ -56,7 +58,7 @@ header img {
 }
 
 .product p {
-    color: #777777;
+    color: #777;
     font-size: .8rem;
 }
 
@@ -70,7 +72,7 @@ header img {
 }
 
 .product button:disabled {
-    background: #aaaaaa;
+    background: #aaa;
     font-style: italic;
 }
 
@@ -79,7 +81,7 @@ header img {
 }
 
 #customer input {
-    border: solid .0125rem #aaaaaa;
+    border: solid .0125rem #aaa;
     border-radius: .4rem;
     padding: .4rem;
 }

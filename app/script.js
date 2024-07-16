@@ -1,6 +1,6 @@
 /* globals simplicite */
 
-const url = 'https://demo.dev.simplicite.io';
+const url = 'https://demo.dev2.simplicite.io';
 const username = 'website';
 const password = 'simplicite';
 

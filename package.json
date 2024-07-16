@@ -13,12 +13,12 @@
     "simplicite": "^3.0.1"
   },
   "devDependencies": {
-    "@ffflorian/jszip-cli": "^3.6.2",
+    "@ffflorian/jszip-cli": "^3.6.4",
     "eslint": "^8.57.0",
-    "npm-check-updates": "^16.14.18",
-    "serve": "^14.2.1",
-    "stylelint": "^16.3.1",
-    "stylelint-config-standard": "^36.0.0"
+    "npm-check-updates": "^16.14.20",
+    "serve": "^14.2.3",
+    "stylelint": "^16.7.0",
+    "stylelint-config-standard": "^36.0.1"
   },
   "scripts": {
     "lint": "eslint \"app/**.js\" && stylelint \"app/**.css\"",

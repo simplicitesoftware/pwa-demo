@@ -1,6 +1,6 @@
 const appName = 'pwa-demo';
 
-const remoteName = 'demo.dev.simplicite.io';
+const remoteName = 'demo.dev2.simplicite.io';
 const remoteURL = `https://${remoteName}`;
 
 const dbVersion = 1;
