@@ -5,7 +5,7 @@ PWA demo
 =========
 
 This project is a **very basic** PWA frontend demo using
-the [Simplicit&eacute;&reg; node.js &amp; browser JavaScript library](https://github.com/simplicitesoftware/nodejs-api).
+the [Simplicit&eacute;&reg; node.js&reg; &amp; brower JavaScript API](https://www.npmjs.com/package/simplicite)
 
 Note that this repository uses only **plain** HTML/Javascript/CSS on purpose.
 
